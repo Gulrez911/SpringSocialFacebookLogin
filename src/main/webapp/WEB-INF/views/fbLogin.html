@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<button id="loginBtn">Facebook Login</button>
+<div id="response"></div>
+<script>
+function getUserData() {
+	FB.api('/me', {fields: 'name,email'}, (response) => {
+		document.getElementById('response').innerHTML = 'Hello ' + response.name;
+	});
+}
+
+window.fbAsyncInit = () => {
+	//SDK loaded, initialize it
+	FB.init({
+		appId      : '363204241248594',
+		xfbml      : true,
+		version    : 'v2.2'
+	});
+
+	//check user session and refresh it
+	FB.getLoginStatus((response) => {
+		if (response.status === 'connected') {
+			//user is authorized
+			document.getElementById('loginBtn').style.display = 'none';
+			getUserData();
+		} else {
+			//user is not authorized
+		}
+	});
+};
+
+//load the JavaScript SDK
+((d, s, id) => {
+	var js, fjs = d.getElementsByTagName(s)[0];
+	if (d.getElementById(id)) {return;}
+	js = d.createElement(s); js.id = id;
+	js.src = "//connect.facebook.com/en_US/sdk.js";
+	fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+//add event listener to login button
+document.getElementById('loginBtn').addEventListener('click', () => {
+	//do the login
+	FB.login((response) => {
+		if (response.authResponse) {
+			//user just authorized your app
+			document.getElementById('loginBtn').style.display = 'none';
+			getUserData();
+		}
+	}, {scope: 'email,public_profile', return_scopes: true});
+}, false);
+</script>
+</body>
+</html>
